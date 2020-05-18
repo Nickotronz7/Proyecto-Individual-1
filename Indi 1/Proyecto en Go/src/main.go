@@ -59,9 +59,49 @@ func bitizer(fName string) (string, int, int) {
 	return cleantxt, bounds.Max.X, bounds.Max.Y
 }
 
+func grayscaler(fName) {
+     // Load image from remote through http
+    // The Go gopher was designed by Renee French. (http://reneefrench.blogspot.com/)
+    // Images are available under the Creative Commons 3.0 Attributions license.
+    resp, err := http.Get("http://golang.org/doc/gopher/fiveyears.jpg")
+    if err != nil {
+        // handle error
+        log.Fatal(err)
+    }
+    defer resp.Body.Close()
+
+    // Decode image to JPEG
+    img, _, err := image.Decode(resp.Body)
+    if err != nil {
+        // handle error
+        log.Fatal(err)
+    }
+    log.Printf("Image type: %T", img)
+
+    // Converting image to grayscale
+    grayImg := image.NewGray(img.Bounds())
+    for y := img.Bounds().Min.Y; y < img.Bounds().Max.Y; y++ {
+        for x := img.Bounds().Min.X; x < img.Bounds().Max.X; x++ {
+            grayImg.Set(x, y, img.At(x, y))
+        }
+    }
+
+    // Working with grayscale image, e.g. convert to png
+    f, err := os.Create("fiveyears_gray.png")
+    if err != nil {
+        // handle error
+        log.Fatal(err)
+    }
+    defer f.Close()
+
+    if err := png.Encode(f, grayImg); err != nil {
+        log.Fatal(err)
+    }
+}
+
 func main() {
-    var fName string = "./res/ferrari.jpg"
-    info, xMax, yMax := bitizer(fName)
-    fmt.Println(xMax, yMax)
-    createFile(info, "foto.txt")
+    var fName string = "Indi 1/Proyecto en Go/res/ferrari.jpg"
+    // info, _, _ := bitizer(fName)
+    // fmt.Println(xMax, yMax)
+    // createFile(info, "foto.txt")
 }
