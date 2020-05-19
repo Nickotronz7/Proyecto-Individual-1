@@ -1,4 +1,5 @@
 import PIL.Image as Image
+import struct
 
 
 def cmat(row, col):
@@ -58,25 +59,41 @@ def intoMatrix(lista, row, col):
     return res
 
 
+def create_binfile(data):
+    # data es la matris de datos que se quiere almacenar en el binario
+    f_out = open('mybin.bin', 'wb')
+
+    rows = len(data)
+    cols = len(data[0])
+
+    for i in range(rows):
+        for j in range(cols):
+            ent = struct.pack('>iiq', i, j, data[i][j])
+            f_out.write(ent)
+            f_out.flush()
+
+    f_out.close()
+
+
 def main():
-    foto = Image.open("Indi 1/res/ferrariC.bmp")
-    foto = foto.convert('L')
-    iMax = foto.size[1]  # 768
-    jMax = foto.size[0]  # 1366
-    data = foto.getdata()
-    datamatrix = intoMatrix(data, iMax, jMax)
-    ker = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
-    res = combu(datamatrix, ker)
-    print(res[65])
-    newdata = []
-    for i in res:
-        for j in i:
-            newdata.append(j)
-    newPic = Image.new('L', foto.size)
-    newPic.putdata(newdata)
-    newPic.save('test.bmp')
-    newPic.close()
-    foto.close()
+    create_binfile([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    # foto = Image.open("Indi 1/res/ferrariC.bmp")
+    # foto = foto.convert('L')
+    # iMax = foto.size[1]  # 768
+    # jMax = foto.size[0]  # 1366
+    # data = foto.getdata()
+    # datamatrix = intoMatrix(data, iMax, jMax)
+    # ker = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
+    # res = combu(datamatrix, ker)
+    # newdata = []
+    # for i in res:
+    #     for j in i:
+    #         newdata.append(j)
+    # newPic = Image.new('L', foto.size)
+    # newPic.putdata(newdata)
+    # newPic.save('test.bmp')
+    # newPic.close()
+    # foto.close()
 
 
 main()
