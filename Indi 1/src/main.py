@@ -1,5 +1,7 @@
 import PIL.Image as Image
 import struct
+import random
+import itertools
 
 
 def cmat(row, col):
@@ -59,30 +61,44 @@ def intoMatrix(lista, row, col):
     return res
 
 
-def create_binfile(data):
-    # data es la matris de datos que se quiere almacenar en el binario
-    f_out = open('mybin.bin', 'wb')
+def create_file(data):
+    f_out = open('mybin.bin', 'w')
+    str_data = ''
+    for e in data:
+        if e <= 9:
+            str_data += '00'+str(e)
+        elif 10 <= e <= 99:
+            str_data += '0'+str(e)
+        else:
+            str_data += str(e)
 
-    rows = len(data)
-    cols = len(data[0])
-
-    for i in range(rows):
-        for j in range(cols):
-            ent = struct.pack('>iiq', i, j, data[i][j])
-            f_out.write(ent)
-            f_out.flush()
-
+    f_out.write(str_data)
+    f_out.flush()
     f_out.close()
 
 
 def main():
-    create_binfile([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    # foto = Image.open("Indi 1/res/ferrariC.bmp")
-    # foto = foto.convert('L')
-    # iMax = foto.size[1]  # 768
-    # jMax = foto.size[0]  # 1366
-    # data = foto.getdata()
-    # datamatrix = intoMatrix(data, iMax, jMax)
+    foto = Image.open("Indi 1/res/ferrariC.bmp")
+    foto = foto.convert('L')
+    iMax = foto.size[1]  #
+    jMax = foto.size[0]  #
+    data = foto.getdata()
+    datamatrix = intoMatrix(data, iMax, jMax)
+    # create_file(datamatrix)
+
+    lis = []
+    for i in range(65):
+        row = []
+        for j in range(78):
+            row += [random.randint(0, 255)]
+        lis += [row]
+        print(row)
+
+    print(lis[49][49])
+
+    lis = itertools.chain.from_iterable(lis)
+    create_file(lis)
+
     # ker = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
     # res = combu(datamatrix, ker)
     # newdata = []
@@ -93,7 +109,7 @@ def main():
     # newPic.putdata(newdata)
     # newPic.save('test.bmp')
     # newPic.close()
-    # foto.close()
+    foto.close()
 
 
 main()
