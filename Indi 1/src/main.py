@@ -21,6 +21,7 @@ def cmat(row, col):
 
 
 def combu(img, kernel):
+    r15 = 0
     img_w = len(img[0])
     img_h = len(img)
     ker_w = len(kernel[0])
@@ -33,7 +34,7 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
-                    print(n)
+                    print(kernel[m][n]+2)
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
