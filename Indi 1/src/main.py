@@ -33,6 +33,7 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
+                    print(n)
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
@@ -78,28 +79,18 @@ def create_file(data):
 
 
 def main():
-    foto = Image.open("Indi 1/res/ferrariC.bmp")
-    foto = foto.convert('L')
-    iMax = foto.size[1]  #
-    jMax = foto.size[0]  #
-    data = foto.getdata()
-    datamatrix = intoMatrix(data, iMax, jMax)
+    # foto = Image.open("Indi 1/res/ferrariC.bmp")
+    # foto = foto.convert('L')
+    # iMax = foto.size[1]  #
+    # jMax = foto.size[0]  #
+    # data = foto.getdata()
+    # datamatrix = intoMatrix(data, iMax, jMax)
     # create_file(datamatrix)
 
-    lis = []
-    for i in range(65):
-        row = []
-        for j in range(78):
-            row += [random.randint(0, 255)]
-        lis += [row]
-        print(row)
+    # create_file([1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-    print(lis[49][49])
-
-    lis = itertools.chain.from_iterable(lis)
-    create_file(lis)
-
-    # ker = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
+    ker = [[0, -1, 0], [-1, 5, -1], [0, -1, 0]]
+    # ker = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
     # res = combu(datamatrix, ker)
     # newdata = []
     # for i in res:
@@ -109,7 +100,9 @@ def main():
     # newPic.putdata(newdata)
     # newPic.save('test.bmp')
     # newPic.close()
-    foto.close()
+    # foto.close()
+
+    combu([[1, 2, 3], [4, 5, 6], [7, 8, 9]], ker)
 
 
 main()

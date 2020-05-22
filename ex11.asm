@@ -2,6 +2,7 @@
  
 section .data
     filename db "mybin.bin",0
+    mynum dd 0
  
 section .bss
     text resb 18
@@ -27,7 +28,7 @@ _start:
     mov rsi, text
     mov rdx, 3
     syscall
- 
+
     mov r12, text ; si era asi :v
 
     mov rax, SYS_CLOSE
