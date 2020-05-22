@@ -42,7 +42,7 @@ bodyn:
     push r10
     push r11
     push r15
-    call readpic    ; llamado de func
+    call readpic    ; lectura de datos de la foto
     call atoi
     mov r12, rax
     pop r15
@@ -57,7 +57,7 @@ bodyn:
     push r11
     push r12
     push r15
-    call readker    ; llamado de func
+    call readker    ; lectura de datos del kernel
     call atoi
     pop r15
     pop r12
@@ -66,26 +66,33 @@ bodyn:
     pop r9
     pop r8
     ;--------------------------------
-    ; push r8
-    ; push r9
-    ; push r10
-    ; push r11
-    
-    ; pop r11
-    ; pop r10
-    ; pop r9
-    ; pop r8
+    push r8
+    push r9
+    push r10
+    push r11
+    ;-------------
+    ;-------
+    sub rax, 2
+    imul rax, r12
+    add r15, rax
+    ;-------
+    ;-------------
+    pop r11
+    pop r10
+    pop r9
+    pop r8
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
-    add r11, 1
+    add r11, 1 ; incremento n
 testn:
     cmp r11, 3
     jl bodyn
 
-    add r10, 1
+    add r10, 1 ; incremento m
 
 testm:
     cmp r10, 3
     jl bodym
+    printVal r15
 
     add r9, 1 ; incremento j
 

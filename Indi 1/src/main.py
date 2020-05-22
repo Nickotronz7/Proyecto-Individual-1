@@ -34,7 +34,7 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
-                    print(kernel[m][n]+2)
+                    print(img[i-h+m][j-w+n])
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
