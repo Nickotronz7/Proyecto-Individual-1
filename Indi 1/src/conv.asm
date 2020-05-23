@@ -15,7 +15,10 @@ section .text
     global _start
 
 _start:
+; ----- test zone------
 
+    ; exit
+; ---------------------
     pop rcx
     pop rax
     mov r15, 0
@@ -130,6 +133,21 @@ testn:
 testm:
     cmp r10, 3
     jl bodym
+
+    cmp r15, 0
+    jl neg
+    cmp r15, 255
+    jg pos
+    jmp pc
+
+pos:
+    mov r15, 255
+    jmp pc
+
+neg:
+    mov r15, 0
+
+pc:
     printVal r15
 
     add r9, 1 ; incremento j
