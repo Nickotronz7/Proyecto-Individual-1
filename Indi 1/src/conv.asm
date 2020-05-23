@@ -3,10 +3,12 @@
 section .data
     picDir db "mybin.bin", 0
     kerDir db "kernel.bin", 0
-    ; rows DD 3
-    ; cols DD 3
 
 section .bss
+    argc resb 8
+    argPos resb 8
+    row resb 4
+    col resb 4
     text resb 3
 
 section .text
@@ -14,6 +16,42 @@ section .text
 
 _start:
 
+    pop rcx
+    pop rax
+    mov r15, 0
+
+_printArgsLoop:
+    mov rcx, [argPos]
+    inc rcx
+    mov [argPos], rcx
+
+    add r15,1
+    cmp r15, 1
+    je _setROw
+    cmp r15, 2
+    je _setCol
+
+_setCol:
+    
+    pop rax
+    mov rcx, [argPos]
+    call atoi
+    sub rax, 1
+    mov rbp, rax
+    mov [col],rax
+    jmp conv
+
+_setROw:  
+    pop rax
+    mov rcx, [argPos]
+    call atoi
+    sub rax, 1
+    mov r14, rax
+    mov [row],rax
+    jmp _printArgsLoop
+
+; ------------------------------------------------------------------------
+conv:
 ; init del for i
     mov r8, 1 ; i fila
     jmp testi
@@ -97,13 +135,13 @@ testm:
     add r9, 1 ; incremento j
 
 testj:
-    cmp r9, 2
+    cmp r9, rbp
     jl bodyj
 
     add r8, 1 ; incremento i
 
 testi:
-    cmp r8, 2
+    cmp r8, r14
     jl bodyi
     exit
 
