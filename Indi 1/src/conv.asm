@@ -2,7 +2,6 @@
 
 section .data
     newline db 10,0
-    space db " ", 0
     picDir db "mybin.bin", 0
     kerDir db "kernel.bin", 0
     outfile db "res.bin", 0
@@ -24,7 +23,6 @@ _start:
 ; ---------------------
     pop rcx
     pop rax
-    mov r15, 0
 
 _printArgsLoop:
     mov rcx, [argPos]
@@ -43,7 +41,7 @@ _setCol:
     mov rcx, [argPos]
     call atoi
     sub rax, 1
-    mov rbp, rax
+    mov rbp, rax ; rbp = col
     jmp conv
 
 _setROw:  
@@ -51,131 +49,83 @@ _setROw:
     mov rcx, [argPos]
     call atoi
     sub rax, 1
-    mov r14, rax
+    mov rbx, rax ; rbx = row
     jmp _printArgsLoop
 
 ; ------------------------------------------------------------------------
 conv:
 ; init del for i
-    mov r8, 1 ; i fila
+    mov r12, 1 ; i fila
     jmp testi
 
 bodyi:
 ; init del for j
-    mov r9, 1 ; j columna
+    mov r13, 1 ; j columna
     jmp testj
 
 bodyj:
 ; init del for m
-    mov r15, 0
-    mov r10, 0 ; m
+    mov r10, 0 ; aka sum
+    mov r14, 0 ; m
     jmp testm
 
 bodym:
 ; init del for n
-    mov r11, 0 ; n
+    mov r15, 0 ; n
     jmp testn
 
 bodyn:
-; apartir del r12
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
-    push r8
-    push r9
     push r10
-    push r11
-    push r15
-    call readpic    ; lectura de datos de la foto
-    call atoi
-    mov r12, rax
-    pop r15
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    ;--------------------------------
+    call readpic
+    mov r8, rax
     push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r15
-    call readker    ; lectura de datos del kernel
-    call atoi
-    pop r15
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    ;--------------------------------
-    push r8
-    push r9
-    push r10
-    push r11
-    ;-------------
-    ;-------
+    call readker
     sub rax, 2
-    imul rax, r12
-    add r15, rax
-    ;-------
-    ;-------------
-    pop r11
-    pop r10
-    pop r9
     pop r8
+    imul r8, rax
+    pop r10
+    add r10, r8
+
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
-    inc r11 ; incremento n
+    inc r15 ; incremento n
 testn:
-    cmp r11, 3
+    cmp r15, 3
     jl bodyn
 
-    inc r10 ; incremento m
+    inc r14 ; incremento m
 
 testm:
-    cmp r10, 3
+    cmp r14, 3
     jl bodym
 
-    ; printVal r15
-    ; print newline
-    cmp r15, 0
-    jl neg
-    cmp r15, 255
+    cmp r10, 0
+    jl nega
+    cmp r10, 255
     jg pos
-    jmp pc
+    jmp proc
 
 pos:
-    mov r15, 255
-    jmp pc
+    mov r10, 255
+    jmp proc
 
-neg:
-    mov r15, 0
+nega:
+    mov r10, 0
 
-pc:
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r15
-    mov rsi, r15
+proc:
+    mov rsi, r10
     call writer
-    pop r15
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
 
-    inc r9 ; incremento j
+    inc r13 ; incremento j
 
 testj:
-    cmp r9, rbp
+    cmp r13, 3 ;rbp
     jl bodyj
 
-    inc r8 ; incremento i
+    inc r12 ; incremento i
 
 testi:
-    cmp r8, r14
+    cmp r12, 2 ;rbx
     jl bodyi
     exit
 
@@ -216,31 +166,35 @@ atoi:
 
 
 readpic:
-    ; r8 i
-    ; r9 j
-    ; r10 m
-    ; r11 n
+    mov qword [text], 0
+    mov qword [text+1], 0
+    mov qword [text+2], 0
+    ; r12 i
+    ; r13 j
+    ; r14 m
+    ; r15 n
 
-    ; i -> r12 = i-1+m
-    xor r12,r12
-    add r12, r10
-    
-    printVal r12
-    print space
+    ; r8 = i - 1 + m
+    mov r8, r12
+    dec r8
+    add r8, r14
 
-    ; j -> r13 = j-1+n
-    xor r13, r13
-    add r13, r11
+    ; r9 = j - 1 + n
+    mov r9, r13
+    dec r9
+    add r9, r15
 
-    print newline
-
-    ; (3cols)i+3j
+    ; r8 = 3*col*r8
     push rbp
-    imul rbp, 3
-    imul r12, rbp ; el 9 = cols*3
+    inc rbp
+    imul r8, 3
+    imul r8, rbp
     pop rbp
-    imul r13, 3 ; 3 de la formula
-    add r12, r13
+
+    ; r9 = 3*r9
+    imul r9, 3
+
+    add r8, r9
 
     mov rax, SYS_OPEN
     mov rdi, picDir
@@ -251,7 +205,7 @@ readpic:
     push rax
     mov	rdi, rax
     mov	rax, SYS_LSEEK
-    mov	rsi, r12 ; inicio
+    mov	rsi, r8 ; inicio
     mov	rdx, 0
     syscall
 
@@ -263,16 +217,25 @@ readpic:
     mov rax, SYS_CLOSE
     pop rdi
     syscall
+
     mov rax, text
+    call atoi
     ret
 
 readker:
-    ; r10 m
-    ; r11 n
+mov qword [text], 0
+mov qword [text+1], 0
+mov qword [text+2], 0
+    ; r14 m
+    ; r15 n
+    ; r8 = m
+    ; r9 = n
+    mov r8, r14
+    imul r8, 9
+    mov r9, r15
+    imul r9, 3
 
-    imul r10, r10, 9 ; el 9 = cols*3
-    imul r11, r11, 3 ; 3 de la formula
-    add r10, r11
+    add r8, r9
 
     mov rax, SYS_OPEN
     mov rdi, kerDir
@@ -283,7 +246,7 @@ readker:
     push rax
     mov	rdi, rax
     mov	rax, SYS_LSEEK
-    mov	rsi, r10 ; inicio
+    mov	rsi, r8 ; inicio
     mov	rdx, 0
     syscall
 
@@ -295,7 +258,9 @@ readker:
     mov rax, SYS_CLOSE
     pop rdi
     syscall
+
     mov rax, text
+    call atoi
     ret
 
 writer:

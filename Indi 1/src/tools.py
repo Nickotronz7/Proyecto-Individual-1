@@ -11,7 +11,7 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
-                    print(m)
+                    mistic(i-h+m,j-w+n)
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
@@ -57,7 +57,7 @@ def rectifier(lista):
 
 
 def mistic(i, j):
-    print((3*4*i+3*j)+1)
+    print(3*4*i+3*j)
 
 
 def to_list(mat):
