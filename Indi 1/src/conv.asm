@@ -1,15 +1,18 @@
 %include "linux64.inc"
 
 section .data
+    newline db 10,0
+    space db " ", 0
     picDir db "mybin.bin", 0
     kerDir db "kernel.bin", 0
+    outfile db "res.bin", 0
+    contents db '-updated-', 0h
 
 section .bss
     argc resb 8
     argPos resb 8
-    row resb 4
-    col resb 4
     text resb 3
+    Num resb 9
 
 section .text
     global _start
@@ -41,7 +44,6 @@ _setCol:
     call atoi
     sub rax, 1
     mov rbp, rax
-    mov [col],rax
     jmp conv
 
 _setROw:  
@@ -50,7 +52,6 @@ _setROw:
     call atoi
     sub rax, 1
     mov r14, rax
-    mov [row],rax
     jmp _printArgsLoop
 
 ; ------------------------------------------------------------------------
@@ -123,17 +124,19 @@ bodyn:
     pop r9
     pop r8
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
-    add r11, 1 ; incremento n
+    inc r11 ; incremento n
 testn:
     cmp r11, 3
     jl bodyn
 
-    add r10, 1 ; incremento m
+    inc r10 ; incremento m
 
 testm:
     cmp r10, 3
     jl bodym
 
+    ; printVal r15
+    ; print newline
     cmp r15, 0
     jl neg
     cmp r15, 255
@@ -148,21 +151,35 @@ neg:
     mov r15, 0
 
 pc:
-    printVal r15
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r15
+    mov rsi, r15
+    call writer
+    pop r15
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
 
-    add r9, 1 ; incremento j
+    inc r9 ; incremento j
 
 testj:
     cmp r9, rbp
     jl bodyj
 
-    add r8, 1 ; incremento i
+    inc r8 ; incremento i
 
 testi:
     cmp r8, r14
     jl bodyi
     exit
 
+; ---------------------------------------------------------------
 
 atoi:
     push    rbx             ; preserve ebx on the stack to be restored after function runs
@@ -204,18 +221,25 @@ readpic:
     ; r10 m
     ; r11 n
 
-    ; r12 = i-1+m
-    ; r13 = j-1+n
-    mov r12, r8
-    sub r12, 1
+    ; i -> r12 = i-1+m
+    xor r12,r12
     add r12, r10
+    
+    printVal r12
+    print space
 
-    mov r13, r9
-    sub r13, 1
+    ; j -> r13 = j-1+n
+    xor r13, r13
     add r13, r11
 
-    imul r12, r12, 9 ; el 9 = cols*3
-    imul r13, r13, 3 ; 3 de la formula
+    print newline
+
+    ; (3cols)i+3j
+    push rbp
+    imul rbp, 3
+    imul r12, rbp ; el 9 = cols*3
+    pop rbp
+    imul r13, 3 ; 3 de la formula
     add r12, r13
 
     mov rax, SYS_OPEN
@@ -272,4 +296,50 @@ readker:
     pop rdi
     syscall
     mov rax, text
+    ret
+
+writer:
+    mov     rdi, Num
+    call    IntToBin8
+    mov     rdx, rax
+    
+    call _write
+    ret
+
+IntToBin8:
+    mov     rcx, 7
+    mov     rdx, rdi
+    
+.NextNibble:
+    shl     sil, 1
+    setc    byte [rdi]
+    add     byte [rdi], "0"
+    add     rdi, 1
+    sub     rcx, 1
+    jns     .NextNibble    
+
+    mov     byte [rdi], 10
+    
+    mov     rax, rdi
+    sub     rax, rdx
+    inc     rax
+    ret
+    
+_write:
+    mov     rcx, 1              ; flag for writeonly access mode (O_WRONLY)
+    mov     rbx, outfile        ; filename of the file to open
+    mov     rax, 5              ; invoke SYS_OPEN (kernel opcode 5)
+    int     80h                 ; call the kernel
+ 
+    mov     rdx, 2              ; whence argument (SEEK_END)
+    mov     rcx, 0              ; move the cursor 0 bytes
+    mov     rbx, rax            ; move the opened file descriptor into EBX
+    mov     rax, 19             ; invoke SYS_LSEEK (kernel opcode 19)
+    int     80h                 ; call the kernel
+ 
+    mov     rdx, 8              ; number of bytes to write - one for each letter of our contents string
+    mov     rcx, Num            ; move the memory address of our contents string into ecx
+    mov     rbx, rbx            ; move the opened file descriptor into EBX (not required as EBX already has the FD)
+    mov     rax, 4              ; invoke SYS_WRITE (kernel opcode 4)
+    int     80h                 ; call the kernel
     ret

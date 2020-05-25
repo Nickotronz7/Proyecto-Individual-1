@@ -11,10 +11,11 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
-                    print(img[i-h+m][j-w+n])
+                    print(m)
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
+
 
 def cmat(row, col):
     t_res = []
@@ -31,6 +32,7 @@ def cmat(row, col):
             i = 0
     return res
 
+
 def intoMatrix(lista, row, col):
     res = cmat(row, col)
     i = 0
@@ -46,8 +48,28 @@ def intoMatrix(lista, row, col):
             j += 1
     return res
 
+
 def rectifier(lista):
     res = []
     for i in lista:
         res += [((51/389)*i+49215/389)]
     return res
+
+
+def mistic(i, j):
+    print((3*4*i+3*j)+1)
+
+
+def to_list(mat):
+    res = []
+    for i in mat:
+        for j in i:
+            res += [j]
+    return res
+
+
+print(
+    combu([[1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13]],
+          [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+)
+

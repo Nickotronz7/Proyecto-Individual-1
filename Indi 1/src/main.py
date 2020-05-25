@@ -26,13 +26,17 @@ def to_list(mat):
 
 
 def main():
-    foto = Image.open("Indi 1/res/ferrariC.bmp")
-    foto = foto.convert('L')
-    data = foto.getdata()
-    foto.close()
-    create_file(data, 'mybin.bin')
-    ker = [[2, 1, 2], [1, 7, 1], [2, 1, 2]]
-    create_file(to_list(ker), 'kernel.bin')
+    # foto = Image.open("Indi 1/res/ferrariC.bmp")
+    # foto = foto.convert('L')
+    # data = foto.getdata()
+    # foto.close()
+    # create_file(data, 'mybin.bin')
+    # # create_file(to_list([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]), 'asdf.txt')
+    # ker = [[2, 1, 2], [1, 7, 1], [2, 1, 2]]
+    # create_file(to_list(ker), 'kernel.bin')
+
+    create_file([1,2,3,4,5,6,7,8,9,10,11,12,13], 'mybin.bin')
+
     # res = combu(datamatrix, ker)
     # newdata = []
     # for i in res:
