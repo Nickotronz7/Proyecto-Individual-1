@@ -2,7 +2,7 @@
 
 section .data
     newline db 10,0
-    picDir db "mybin.bin", 0
+    picDir db "pic.bin", 0
     kerDir db "kernel.bin", 0
     outfile db "res.bin", 0
     contents db '-updated-', 0h
@@ -82,7 +82,7 @@ bodyn:
     mov r8, rax
     push r8
     call readker
-    sub rax, 2
+    sub rax, 4
     pop r8
     imul r8, rax
     pop r11

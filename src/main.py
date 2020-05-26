@@ -1,6 +1,6 @@
 import PIL.Image as Image
-import subprocess
-from tools import *
+import os
+from loadFile import loadFile
 
 
 def create_file(data, name):
@@ -27,32 +27,30 @@ def to_list(mat):
 
 
 def main():
-    foto = Image.open(
-        "foto.bmp")
+
+    loader = loadFile()
+    loader.mainloop()
+    foto = Image.open(loader.get_path())
+    foto.show()
     foto = foto.convert('L')
-    rows = foto.size[0]
+    rows = foto.size[1]
     cols = foto.size[0]
     data = foto.getdata()
     foto.close()
-    create_file(data, 'mybin.bin')
+
+    create_file(data, 'pic.bin')
     create_file([], 'res.bin')
-    # combu(intoMatrix(data, rows, cols), [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-    # create_file(to_list([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]), 'asdf.txt')
-    # ker = [[2, 1, 2], [1, 7, 1], [2, 1, 2]]
-    # create_file(to_list(ker), 'kernel.bin')
+    sharpen = [[4, 3, 4], [3, 9, 3], [4, 3, 4]]
+    oversharpen = [[4, 0, 4], [0, 13, 0], [4, 0, 4]]
+    create_file(to_list(sharpen), 'kernel.bin')
+    create_file([],'res.bin')
 
-    # create_file([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'mybin.bin')
-
-    # res = combu(datamatrix, ker)
-    # newdata = []
-    # for i in res:
-    #     for j in i:
-    #         newdata.append(j)
-    # newPic = Image.new('L', foto.size)
-    # newPic.putdata(newdata)
-    # newPic.save('test.bmp')
-    # newPic.close()
-    # foto.close()
+    # sharpening
+    os.system("nasm -f elf64 conv.asm -o conv.o")
+    os.system("ld conv.o -o conv")
+    os.system("./conv "+str(rows)+" "+str(cols))
+    os.rename(r'res.bin',r'sharpening')
 
 
-main()
+if __name__ == '__main__':
+    main()
