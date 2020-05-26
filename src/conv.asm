@@ -226,9 +226,9 @@ readpic:
     ret
 
 readker:
-mov qword [text], 0
-mov qword [text+1], 0
-mov qword [text+2], 0
+    mov qword [text], 0
+    mov qword [text+1], 0
+    mov qword [text+2], 0
     ; r14 m
     ; r15 n
     ; r8 = m
@@ -267,6 +267,17 @@ mov qword [text+2], 0
     ret
 
 writer:
+
+    mov qword [Num], 0
+    mov qword [Num+1], 0
+    mov qword [Num+2], 0
+    mov qword [Num+3], 0
+    mov qword [Num+4], 0
+    mov qword [Num+5], 0
+    mov qword [Num+6], 0
+    mov qword [Num+7], 0
+    mov qword [Num+8], 0
+
     mov     rdi, Num
     call    IntToBin8
     mov     rdx, rax
@@ -294,20 +305,55 @@ IntToBin8:
     ret
     
 _write:
-    mov     rcx, 1              ; flag for writeonly access mode (O_WRONLY)
-    mov     rbx, outfile        ; filename of the file to open
-    mov     rax, 5              ; invoke SYS_OPEN (kernel opcode 5)
-    int     80h                 ; call the kernel
+
+    ; mov r8, r12
+    ; dec r8
+    ; mov r9, r13
+    ; dec r9
+    ; push rbp
+    ; inc  rbp
+    ; imul r8, 8
+    ; imul r8, rbp
+    ; pop rbp
+    ; imul r9, 8
+    ; add r8, r9
+
+    ; r12 i
+    ; r13 j
+
+    mov r8, r12
+    dec r8
+    push rbp
+    inc rbp
+    imul r8, 8
+    imul r8, rbp
+    pop rbp
+    mov r9, r13
+    imul r9, 8
+    sub r9, 8
+    add r8, r9
+
+    mov rax, SYS_OPEN
+    mov rdi, outfile
+    mov rsi, O_CREAT+O_WRONLY
+    mov rdx, 0644o
+    syscall
+   
+    push rax
+    mov	rdi, rax
+    mov	rax, SYS_LSEEK
+    mov	rsi, r8 ; inicio
+    mov	rdx, 0
+    syscall
+
+    mov rax, SYS_WRITE
+    mov rsi, Num
+    mov rdx, 8
+    syscall
  
-    mov     rdx, 2              ; whence argument (SEEK_END)
-    mov     rcx, 0              ; move the cursor 0 bytes
-    mov     rbx, rax            ; move the opened file descriptor into EBX
-    mov     rax, 19             ; invoke SYS_LSEEK (kernel opcode 19)
-    int     80h                 ; call the kernel
- 
-    mov     rdx, 8              ; number of bytes to write - one for each letter of our contents string
-    mov     rcx, Num            ; move the memory address of our contents string into ecx
-    mov     rbx, rbx            ; move the opened file descriptor into EBX (not required as EBX already has the FD)
-    mov     rax, 4              ; invoke SYS_WRITE (kernel opcode 4)
-    int     80h                 ; call the kernel
+    mov rax, SYS_CLOSE
+    pop rdi
+    syscall
     ret
+
+ 
