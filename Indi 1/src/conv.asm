@@ -49,7 +49,7 @@ _setROw:
     mov rcx, [argPos]
     call atoi
     sub rax, 1
-    mov rbx, rax ; rbx = row
+    mov r11, rax ; rbx = row
     jmp _printArgsLoop
 
 ; ------------------------------------------------------------------------
@@ -77,6 +77,7 @@ bodym:
 bodyn:
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
     push r10
+    push r11
     call readpic
     mov r8, rax
     push r8
@@ -84,9 +85,9 @@ bodyn:
     sub rax, 2
     pop r8
     imul r8, rax
+    pop r11
     pop r10
     add r10, r8
-
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
     inc r15 ; incremento n
 testn:
@@ -99,6 +100,7 @@ testm:
     cmp r14, 3
     jl bodym
 
+    push r11
     cmp r10, 0
     jl nega
     cmp r10, 255
@@ -115,17 +117,18 @@ nega:
 proc:
     mov rsi, r10
     call writer
+    pop r11
 
     inc r13 ; incremento j
 
 testj:
-    cmp r13, 3 ;rbp
+    cmp r13, rbp
     jl bodyj
 
     inc r12 ; incremento i
 
 testi:
-    cmp r12, 2 ;rbx
+    cmp r12, r11 ;rbx
     jl bodyi
     exit
 

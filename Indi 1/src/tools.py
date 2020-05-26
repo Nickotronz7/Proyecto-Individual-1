@@ -11,7 +11,6 @@ def combu(img, kernel):
             sum = 0
             for m in range(ker_h):
                 for n in range(ker_w):
-                    mistic(i-h+m,j-w+n)
                     sum += kernel[m][n]*img[i-h+m][j-w+n]
             img_conv[i][j] = sum
     return img_conv
@@ -68,8 +67,7 @@ def to_list(mat):
     return res
 
 
-print(
-    combu([[1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13]],
-          [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
-)
-
+# print(
+#     combu([[1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13]],
+#           [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+# )
