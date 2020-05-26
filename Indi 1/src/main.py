@@ -28,14 +28,15 @@ def to_list(mat):
 
 def main():
     foto = Image.open(
-        "/home/nickotronz7/Documents/ProyectosArqui/Indi 1/res/otros/ferrariC copy.jpg")
+        "foto.bmp")
     foto = foto.convert('L')
     rows = foto.size[0]
     cols = foto.size[0]
     data = foto.getdata()
     foto.close()
     create_file(data, 'mybin.bin')
-    combu(intoMatrix(data, rows, cols), [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    create_file([], 'res.bin')
+    # combu(intoMatrix(data, rows, cols), [[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
     # create_file(to_list([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]), 'asdf.txt')
     # ker = [[2, 1, 2], [1, 7, 1], [2, 1, 2]]
     # create_file(to_list(ker), 'kernel.bin')
