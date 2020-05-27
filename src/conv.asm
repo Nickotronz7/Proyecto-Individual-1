@@ -82,7 +82,7 @@ bodyn:
     mov r8, rax
     push r8
     call readker
-    sub rax, 4
+    sub rax, 2
     pop r8
     imul r8, rax
     pop r11

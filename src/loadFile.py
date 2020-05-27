@@ -6,7 +6,7 @@ from tkinter import filedialog
 class loadFile(Tk):
     def __init__(self):
         super(loadFile, self).__init__()
-        self.title("Python Tkinter Dialog Widget")
+        self.title("Proyecto Individual 1 - Nickolas Rodriguez")
         self.minsize(100, 100)
 
         self.Path = ''
@@ -24,19 +24,21 @@ class loadFile(Tk):
         return self.Path
 
     def button1(self):
-        self.button = ttk.Button(self.labelFrame, text="Browse A File", command=self.fileDialog)
+        self.button = ttk.Button(
+            self.labelFrame, text="Browse A File", command=self.fileDialog)
         self.button.grid(column=1, row=1)
 
     def button2(self):
-        self.button = ttk.Button(self.labelFrame, text="Ok", command=self.salir)
+        self.button = ttk.Button(
+            self.labelFrame, text="Ok", command=self.salir)
         self.button.grid(column=2, row=1)
 
     def salir(self):
         self.destroy()
 
     def fileDialog(self):
-        self.filename = filedialog.askopenfilename(initialdir="/~", title="Select A File", filetypes=
-        (("bmp files", "*.bmp"), ("all files", "*.*")))
+        self.filename = filedialog.askopenfilename(
+            initialdir="/~", title="Select A File", filetypes=(("all files", "*.*"), ("bmp files", "*.bmp")))
         self.label = ttk.Label(self.labelFrame, text="")
         self.label.grid(column=1, row=2)
         self.label.configure(text=self.filename)
