@@ -17,10 +17,7 @@ section .text
     global _start
 
 _start:
-; ----- test zone------
-
-    ; exit
-; ---------------------
+; Lectura de los parametros del archivo
     pop rcx
     pop rax
 
@@ -78,10 +75,10 @@ bodyn:
 ;------------------------------------------------------------------------------------------------------------------------------------------------------------
     push r10
     push r11
-    call readpic
+    call readpic ; lectura de datos del archivo de la foto
     mov r8, rax
     push r8
-    call readker
+    call readker ; lectura de datos del archivo del kernel
     sub rax, 2
     pop r8
     imul r8, rax
@@ -100,6 +97,9 @@ testm:
     cmp r14, 3
     jl bodym
 
+    ; rectificacion del valor calculado por la combulucion
+    ; si es mayor que 255 se setea como 255
+    ; si es menor que 0  se setea como 0
     push r11
     cmp r10, 0
     jl nega
@@ -116,7 +116,7 @@ nega:
 
 proc:
     mov rsi, r10
-    call writer
+    call writer ; escritura del dato calculado en el archivo de salida
     pop r11
 
     inc r13 ; incremento j
@@ -128,50 +128,52 @@ testj:
     inc r12 ; incremento i
 
 testi:
-    cmp r12, r11 ;rbx
+    cmp r12, r11
     jl bodyi
     exit
 
 ; ---------------------------------------------------------------
-
+; funcion que convierte el valor de rax en 'string' a int
 atoi:
-    push    rbx             ; preserve ebx on the stack to be restored after function runs
-    push    rcx             ; preserve ecx on the stack to be restored after function runs
-    push    rdx             ; preserve edx on the stack to be restored after function runs
-    push    rsi             ; preserve esi on the stack to be restored after function runs
-    mov     rsi, rax        ; move pointer in eax into esi (our number to convert)
-    mov     rax, 0          ; initialise eax with decimal value 0
-    mov     rcx, 0          ; initialise ecx with decimal value 0
+    push    rbx             
+    push    rcx             
+    push    rdx             
+    push    rsi             
+    mov     rsi, rax        ; se muelve el puntero del numero que se quiere convertir a rsi
+    mov     rax, 0          
+    mov     rcx, 0          
  
 .multiplyLoop:
-    xor     rbx, rbx        ; resets both lower and uppper bytes of ebx to be 0
-    mov     bl, [rsi+rcx]   ; move a single byte into ebx register's lower half
-    cmp     bl, 48          ; compare ebx register's lower half value against ascii value 48 (char value 0)
-    jl      .finished       ; jump if less than to label finished
-    cmp     bl, 57          ; compare ebx register's lower half value against ascii value 57 (char value 9)
-    jg      .finished       ; jump if greater than to label finished
+    xor     rbx, rbx        ; se setea rbx a 0
+    mov     bl, [rsi+rcx]   ; se mueve un unico byte a la parte mas baja de rbx
+    cmp     bl, 48          ; se compara el bit con el valor 48 en ascii (char value 0)
+    jl      .finished       ; jump if less salta al final
+    cmp     bl, 57          ; se compara el bit con el valor 57 en ascii (char value 9)
+    jg      .finished       ; jump if greater salta al final
  
-    sub     bl, 48          ; convert ebx register's lower half to decimal representation of ascii value
-    add     rax, rbx        ; add ebx to our interger value in eax
-    mov     rbx, 10         ; move decimal value 10 into ebx
-    mul     rbx             ; multiply eax by ebx to get place value
-    inc     rcx             ; increment ecx (our counter register)
-    jmp     .multiplyLoop   ; continue multiply loop
+    sub     bl, 48          ; se convierte de ascii a decimal al restar 48
+    add     rax, rbx        ; se suma el valor de rax a rbx
+    mov     rbx, 10         ; se almacena 10 en rbx
+    mul     rbx             ; se multiplica rax por rbx para mover a la posicion correspondiente el numero convertido
+    inc     rcx             ; incremento el contador de rcx
+    jmp     .multiplyLoop   ; continua la conversoin
  
 .finished:
-    mov     rbx, 10         ; move decimal value 10 into ebx
-    div     rbx             ; divide eax by value in ebx (in this case 10)
-    pop     rsi             ; restore esi from the value we pushed onto the stack at the start
-    pop     rdx             ; restore edx from the value we pushed onto the stack at the start
-    pop     rcx             ; restore ecx from the value we pushed onto the stack at the start
-    pop     rbx             ; restore ebx from the value we pushed onto the stack at the start
+    mov     rbx, 10         ; se almacena 10 en rbx
+    div     rbx             ; se divide rax entre rbx para que los numero no queden corridos
+    pop     rsi
+    pop     rdx
+    pop     rcx
+    pop     rbx             
     ret
 
 
 readpic:
+    ; limpieza del buffer para evitar errores de lectura
     mov qword [text], 0
     mov qword [text+1], 0
     mov qword [text+2], 0
+
     ; r12 i
     ; r13 j
     ; r14 m
@@ -187,6 +189,7 @@ readpic:
     dec r9
     add r9, r15
 
+    ; claculo de la posicion en la que se tiene que leer el archivo de la foto
     ; r8 = 3*col*r8
     push rbp
     inc rbp
@@ -199,22 +202,23 @@ readpic:
 
     add r8, r9
 
-    mov rax, SYS_OPEN
-    mov rdi, picDir
-    mov rsi, O_RDONLY
+    mov rax, SYS_OPEN   ; seteo de flag
+    mov rdi, picDir     ; se copia el nombre del archivo a leer en rdi
+    mov rsi, O_RDONLY   ; se establece que solo se va a realizar la operacion de 
+                        ;  lectura
     mov rdx, 0
     syscall
 
     push rax
     mov	rdi, rax
     mov	rax, SYS_LSEEK
-    mov	rsi, r8 ; inicio
+    mov	rsi, r8 ; se define la posicion en la que se va a empezar a leer
     mov	rdx, 0
     syscall
 
     mov rax, SYS_READ
-    mov rsi, text
-    mov rdx, 3
+    mov rsi, text ; buffer donde se va a almacenar los bytes leidos
+    mov rdx, 3  ; cantidad de bytes a leer
     syscall
 
     mov rax, SYS_CLOSE
@@ -222,52 +226,55 @@ readpic:
     syscall
 
     mov rax, text
-    call atoi
+    call atoi ; llamada para la conversion de los datos leidos
     ret
 
 readker:
+    ; limpieza del buffer para evitar errores de lectura
     mov qword [text], 0
     mov qword [text+1], 0
     mov qword [text+2], 0
+
     ; r14 m
     ; r15 n
     ; r8 = m
     ; r9 = n
+    ; calculo de la posicion de lectura
     mov r8, r14
     imul r8, 9
     mov r9, r15
     imul r9, 3
-
     add r8, r9
 
-    mov rax, SYS_OPEN
-    mov rdi, kerDir
-    mov rsi, O_RDONLY
+    mov rax, SYS_OPEN   ; seteo de flag
+    mov rdi, kerDir     ; se copia el nombre del archivo a leer en rdi
+    mov rsi, O_RDONLY   ; se establece que solo se va a realizar la operacion de 
+                        ;  lectura 
     mov rdx, 0
     syscall
 
     push rax
     mov	rdi, rax
     mov	rax, SYS_LSEEK
-    mov	rsi, r8 ; inicio
+    mov	rsi, r8 ; se define la posicion en la que se va a empezar a leer
     mov	rdx, 0
     syscall
 
     mov rax, SYS_READ
-    mov rsi, text
-    mov rdx, 3
+    mov rsi, text ; buffer donde se va a almacenar los bytes leidos
+    mov rdx, 3    ; cantidad de bytes a leer
     syscall
 
     mov rax, SYS_CLOSE
     pop rdi
-    syscall
+    syscall 
 
     mov rax, text
-    call atoi
+    call atoi ; llamada para la conversion de los datos leidos
     ret
 
 writer:
-
+    ; limpieza del buffer para evitar errores de lectura
     mov qword [Num], 0
     mov qword [Num+1], 0
     mov qword [Num+2], 0
@@ -279,26 +286,26 @@ writer:
     mov qword [Num+8], 0
 
     mov     rdi, Num
-    call    IntToBin8
+    call    IntToBin8 ; llamada para la conversion de los datos a escribir
     mov     rdx, rax
     
-    call _write
+    call _write ; llamado a la funcion para escribir el dato calculado
     ret
 
 IntToBin8:
-    mov     rcx, 7
+    ; conversion de int a binario
+    mov     rcx, 7 ; longitud maxima del numero a ser convertido
     mov     rdx, rdi
     
 .NextNibble:
     shl     sil, 1
     setc    byte [rdi]
-    add     byte [rdi], "0"
+    add     byte [rdi], "0" 
     add     rdi, 1
     sub     rcx, 1
     jns     .NextNibble    
 
-    mov     byte [rdi], 10
-    
+    mov     byte [rdi], 10    
     mov     rax, rdi
     sub     rax, rdx
     inc     rax
@@ -306,48 +313,34 @@ IntToBin8:
     
 _write:
 
-    ; mov r8, r12
-    ; dec r8
-    ; mov r9, r13
-    ; dec r9
-    ; push rbp
-    ; inc  rbp
-    ; imul r8, 8
-    ; imul r8, rbp
-    ; pop rbp
-    ; imul r9, 8
-    ; add r8, r9
-
-    ; r12 i
-    ; r13 j
-
+    ; calculo de la posicion apartir de donde se empezara a escribir
     mov r8, r12
     dec r8
+    mov r9, r13
+    dec r9
     push rbp
-    inc rbp
+    inc  rbp
     imul r8, 8
     imul r8, rbp
     pop rbp
-    mov r9, r13
     imul r9, 8
-    sub r9, 8
     add r8, r9
 
     mov rax, SYS_OPEN
-    mov rdi, outfile
-    mov rsi, O_CREAT+O_WRONLY
+    mov rdi, outfile            ; Definicion del path del archivo a escribir
+    mov rsi, O_CREAT+O_WRONLY   ; Se creara si no existe el archivo 
     mov rdx, 0644o
     syscall
    
     push rax
     mov	rdi, rax
     mov	rax, SYS_LSEEK
-    mov	rsi, r8 ; inicio
+    mov	rsi, r8 ; definicion de la posicion apartir de donde se escribira
     mov	rdx, 0
     syscall
 
     mov rax, SYS_WRITE
-    mov rsi, Num
+    mov rsi, Num ; informacion a escribir
     mov rdx, 8
     syscall
  
@@ -355,5 +348,3 @@ _write:
     pop rdi
     syscall
     ret
-
- 
