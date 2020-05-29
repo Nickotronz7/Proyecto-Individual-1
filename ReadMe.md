@@ -2,7 +2,7 @@
 
 Este proyecto trata de sobre el procesamiento de imagenes en ensamblador mediante la aplicacion de un filtro de Sharpening y Oversharpening utilizando el algoritmo de convolucion.
 
-SOLO SIRVE EN LINUX
+SOLO SE PUEDE EJECUTAR EN LINUX
 
 ## Instalacion de dependencias
 
