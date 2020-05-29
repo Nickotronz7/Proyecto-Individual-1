@@ -4,7 +4,7 @@ Este proyecto trata de sobre el procesamiento de imagenes en ensamblador mediant
 
 ## Instalacion de dependencias
 
-Para poder ejecutar correctamente el proyecto se deben instalar las dependencias necesarias para mayor facilidad basta con abrir el directorio en terminal donde se encuentra el archivo installDep.sh en la carpeta src y ejecutar los siguientes comandos, ademas de ya tener instalado previamente la version 3.8 o superior de Python
+Para poder ejecutar correctamente el proyecto se deben instalar las dependencias necesarias para mayor facilidad basta con abrir el directorio en terminal donde se encuentra el archivo installDep.sh en la carpeta src y ejecutar los siguientes comandos
 
 ```bash
 chmod +x installDep.sh
