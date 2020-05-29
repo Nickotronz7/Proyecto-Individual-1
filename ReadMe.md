@@ -2,6 +2,8 @@
 
 Este proyecto trata de sobre el procesamiento de imagenes en ensamblador mediante la aplicacion de un filtro de Sharpening y Oversharpening utilizando el algoritmo de convolucion.
 
+SOLO SIRVE EN LINUX
+
 ## Instalacion de dependencias
 
 Para poder ejecutar correctamente el proyecto se deben instalar las dependencias necesarias para mayor facilidad basta con abrir el directorio en terminal donde se encuentra el archivo installDep.sh en la carpeta src y ejecutar los siguientes comandos
