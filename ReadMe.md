@@ -1,6 +1,6 @@
 # Proyecto Individual 1 - Nickolas Rodriguez Cordero
 
-Este proyecto trata de sobre el procesamiento de imagenes en ensamblador 
+Este proyecto trata de sobre el procesamiento de imagenes en ensamblador mediante la aplicacion de un filtro de Sharpening y Oversharpening utilizando el algoritmo de convolucion.
 
 ## Instalacion de dependencias
 
